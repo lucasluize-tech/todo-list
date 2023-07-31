@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store';
 import { browser } from '$app/environment';
+import { derived } from 'svelte/store';
 
 let localState;
 if (browser) {
@@ -19,9 +20,11 @@ const appState = localState ? JSON.parse(localState) : initialState;
 
 export type AppState = {
 	todos: {
+		id: string;
 		text: string;
 		completed: boolean;
 		editing: boolean;
+		priority: string;
 	}[];
 };
 
@@ -31,3 +34,7 @@ export const update = (callback: (state: AppState) => AppState) => {
 	state.update(() => updatedState);
 	localStorage.setItem('todos', JSON.stringify(updatedState));
 };
+
+export const completeItems = derived(state, ($state) => {
+	return $state.todos.every((todo) => todo.completed);
+});
