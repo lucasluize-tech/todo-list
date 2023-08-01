@@ -131,120 +131,91 @@
 	}
 </script>
 
-<div class=" bg-slate-800 h-screen">
+<div class="bg-slate-800 scroll-smooth">
 	<h1 class="text-3xl font-bold text-white text-center mb-12">ToDo List</h1>
-	<div class="container mx-auto flex flex-col items-center gap-3">
-		<form on:submit|preventDefault={addTodo} class="flex gap-2 w-[60%]">
-			<input
-				type="text"
-				placeholder="add your todo here"
-				bind:value={textInput}
-				class="m-2 px-2 py-1 rounded-md flex-grow bg-gray-300"
-				bind:this={ref}
-			/>
-			<select bind:value={priorityInput} class="m-2 p-2 bg-gray-300 rounded-md">
-				<option value="high">High</option>
-				<option value="medium">Medium</option>
-				<option value="low">Low</option>
-			</select>
-			<button
-				on:click={() => console.log(textInput)}
-				class="text-white m-2 p-5 bg-purple-500 rounded-lg"
-			>
-				ADD
-			</button>
-		</form>
-
-		<div class="flex items-center gap-3 w-[60%]">
-			{#if $completeItems}
-				<input type="checkbox" name="checkall" on:click={() => resetAll()} />
-				<label for="checkall" class="text-white">Uncheck all</label>
-			{:else}
-				<input type="checkbox" name="checkall" on:click={() => completeAll()} />
-				<label for="checkall" class="text-white">Check all</label>
-			{/if}
-			<select bind:value={sortOption} class="my-4 p-2 bg-gray-400 rounded-md">
-				<option value="text">Sort by text</option>
-				<option value="priority">Sort by priority</option>
-				<option value="completed">Sort by completed</option>
-			</select>
-
-			<button
-				on:click={() => (showConfirm = true)}
-				class="text-white m-2 ml-72 p-2 bg-red-500 rounded-lg"
-			>
-				Delete all
-			</button>
-		</div>
-
-		{#if showConfirm}
+	{#if showConfirm}
+		<div
+			class="z-10 flex items-center justify-center fixed left-0 bottom-0 w-full h-full bg-gray-500 bg-opacity-75"
+			aria-labelledby="modal-title"
+			role="dialog"
+			aria-modal="true"
+		>
 			<div
-				class="z-10 inset-0 overflow-y-auto"
-				aria-labelledby="modal-title"
-				role="dialog"
-				aria-modal="true"
+				class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
 			>
+				<!--
+							Background overlay, show/hide based on modal state.
+					-->
 				<div
-					class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+					class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+					aria-hidden="true"
+				/>
+				<div
+					class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
 				>
-					<!--
-                Background overlay, show/hide based on modal state.
-            -->
-					<div
-						class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-						aria-hidden="true"
-					/>
-					<div
-						class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-					>
-						<div class="p-6">
-							<h2 id="modal-title" class="text-xl font-medium text-gray-900">
-								Are you sure you want to delete all?
-							</h2>
-							<div class="mt-4">
-								<button
-									type="button"
-									on:click={() => {
-										deleteAll();
-										showConfirm = false;
-									}}
-									class="mr-4 text-white p-2 bg-red-500 rounded-lg"
-								>
-									Yes, delete all
-								</button>
-								<button
-									type="button"
-									on:click={() => (showConfirm = false)}
-									class="text-white p-2 bg-blue-500 rounded-lg"
-								>
-									No, cancel
-								</button>
-							</div>
+					<div class="p-6">
+						<h2 id="modal-title" class="text-xl font-medium text-gray-900">
+							Are you sure you want to delete all?
+						</h2>
+						<div class="mt-4">
+							<button
+								type="button"
+								on:click={() => {
+									deleteAll();
+									showConfirm = false;
+								}}
+								class="mr-4 mb-3 text-white p-2 bg-red-500 rounded-lg"
+							>
+								Yes, delete all
+							</button>
+							<button
+								type="button"
+								on:click={() => (showConfirm = false)}
+								class="text-white p-2 bg-blue-500 rounded-lg"
+							>
+								No, cancel
+							</button>
 						</div>
 					</div>
 				</div>
 			</div>
-		{/if}
-
-		<div class="flex flex-col w-[60%] gap-5">
+		</div>
+	{/if}
+	<div class="container mx-auto flex flex-col items-center gap-3 h-screen w-full justify-around">
+		<div class="flex flex-col sm:w-[80%] w-full gap-5 overflow-auto sm:items-stretch">
 			{#each sortedTodos as todo}
 				{#if todo.editing}
-					<div class="flex flex-row gap-3">
-						<input type="text" bind:value={todo.text} class="flex-grow m-2 px-2 py-1 rounded-md" />
-						<select bind:value={todo.priority} class="m-2 px-2 py-1 rounded-md">
-							<option value="high">High</option>
-							<option value="medium">Medium</option>
-							<option value="low">Low</option>
-						</select>
-						<button
-							class="ml-2 px-2 py-1 bg-blue-500 rounded-md text-white"
-							on:click={() => setEditing(todo.id, false)}>Save</button
-						>
+					<div class="flex flex-row justify-around sm:gap-3 w-full">
+						<input
+							type="text"
+							bind:value={todo.text}
+							class="sm:flex-grow my-2 px-2 py-1 rounded-md"
+						/>
+
+						<div class="flex flex-col sm:flex-row justify-center">
+							<select bind:value={todo.priority} class="m-2 w-full px-2 py-1 rounded-md">
+								<option value="high">High</option>
+								<option value="medium">Medium</option>
+								<option value="low">Low</option>
+							</select>
+							<button
+								class="sm:ml-2 mx-2 w-full sm:m-2 px-2 py-1 bg-blue-500 rounded-md text-white"
+								on:click={() => setEditing(todo.id, false)}>Save</button
+							>
+						</div>
 					</div>
 				{:else}
 					<div class="flex flex-row gap-3 {getPriorityClass(todo.priority)} p-2 rounded-lg">
 						<input type="checkbox" bind:checked={todo.completed} class="mr-2" />
-						<p class="block text-xl font-bold flex-grow text-slate-800">{todo.text}</p>
+						{#if todo.completed}
+							<p class="block text-sm self-center font-bold flex-grow text-slate-400 line-through">
+								{todo.text}
+							</p>
+						{:else}
+							<p class="block text-sm self-center font-bold flex-grow text-slate-800">
+								{todo.text}
+							</p>
+						{/if}
 						<button
 							class="ml-2 px-2 py-1 bg-blue-500 rounded-md text-white"
 							on:click={() => setEditing(todo.id, true)}
@@ -260,6 +231,52 @@
 					</div>
 				{/if}
 			{/each}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<form on:submit|preventDefault={addTodo} class="flex gap-2 sm:w-[80%] w-full mx-auto">
+				<input
+					type="text"
+					placeholder="{' '}ex: Hire Lucas to build an App!"
+					bind:value={textInput}
+					class="my-3 py-1 rounded-md flex-grow bg-gray-300"
+					bind:this={ref}
+					required
+				/>
+				<select bind:value={priorityInput} class="my-3 py-1 bg-gray-300 rounded-md">
+					<option value="high">High</option>
+					<option value="medium">Medium</option>
+					<option value="low">Low</option>
+				</select>
+				<button
+					on:click={() => console.log(textInput)}
+					class="text-white my-3 p-2 bg-purple-500 rounded-lg"
+				>
+					Add
+				</button>
+			</form>
+			<div
+				class="flex items-center sm:gap-5 sm:w-[80%] w-full mx-auto sm:flex-row flex-col sm:mb-20 mb-10 justify-between"
+			>
+				{#if $completeItems}
+					<input type="checkbox" name="checkall" on:click={() => resetAll()} />
+					<label for="checkall" class="text-white">Uncheck all</label>
+				{:else}
+					<input type="checkbox" name="checkall" on:click={() => completeAll()} />
+					<label for="checkall" class="text-white">Check all</label>
+				{/if}
+				<select bind:value={sortOption} class="flex-grow my-4 p-2 bg-gray-400 rounded-md">
+					<option value="text">Sort by text</option>
+					<option value="priority">Sort by priority</option>
+					<option value="completed">Sort by completed</option>
+				</select>
+				<button
+					on:click={() => (showConfirm = true)}
+					class="text-white my-3 p-2 bg-red-500 rounded-lg"
+				>
+					Delete all
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
